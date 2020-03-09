@@ -5,7 +5,7 @@ Following this guide:
     https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/
 '''
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 
 # configuration
@@ -41,12 +41,20 @@ CORS(app, resources={f'/*': {'origins': '*'}})
 def ping_pong():
     return jsonify('pong!')
 
-@app.route('/tasks', methods=['GET'])
+@app.route('/tasks', methods=['GET', 'POST'])
 def all_tasks():
-    return jsonify({
-            'status': 'success',
-            'tasks': TASKS
+    response_object = {'status': 'success'}
+    if request.method == 'POST':
+        post_data = request.get_json()
+        TASKS.append({
+            'title': post_data.get('title'),
+            'owner': post_data.get('owner'),
+            'complete': post_data.get('complete')
         })
+        response_object['message'] = 'Task added!'
+    else:
+        response_object['tasks'] = TASKS
+    return jsonify(response_object)
 
 
 if __name__ == '__main__':
