@@ -80,7 +80,7 @@ def single_task(task_id):
             'id': uuid.uuid4().hex,
             'title': post_data.get('title'),
             'owner': post_data.get('owner'),
-            'complete': post_date.get('complete')
+            'complete': post_data.get('complete')
             })
         response_object['message'] = 'Task updated!'
     return jsonify(response_object)
