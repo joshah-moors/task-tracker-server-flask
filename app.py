@@ -14,32 +14,7 @@ from flask_cors import CORS
 
 # configuration
 DEBUG = True
-
 PICKLE_FILE = 'app_data.pickle'
-if os.path.exists(PICKLE_FILE):
-    print('load data')
-else:
-    print('init data')
-TASKS = [
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Scaffold front-end',
-        'owner': 'Joshah',
-        'complete': False
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Production JS Server',
-        'owner': 'N/A',
-        'complete': False
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Add CORS to Flask server',
-        'owner': 'Joshah',
-        'complete': True
-    },
-]
 
 # instantiate app
 app = Flask(__name__)
@@ -62,6 +37,31 @@ def remove_task(task_id):
     except ValueError:
         return False
 
+# initialize the data (small pickle data for testing)
+if os.path.exists(PICKLE_FILE):
+    print('load data')
+else:
+    TASKS = [
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Scaffold front-end',
+            'owner': 'Joshah',
+            'complete': False
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Production JS Server',
+            'owner': 'N/A',
+            'complete': False
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Add CORS to Flask server',
+            'owner': 'Joshah',
+            'complete': True
+        },
+    ]
+    save_app_data()
 
 # test route
 @app.route('/ping', methods=['GET'])
