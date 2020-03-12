@@ -42,13 +42,6 @@ app.config.from_object(__name__)
 CORS(app, resources={f'/*': {'origins': '*'}})
 
 # supporting functions
-#def remove_task(task_id):
-#    for task in TASKS:
-#        if task['id'] == task_id:
-#            TASKS.remove(task)
-#            return True
-#    return False
-
 def remove_task(task_id):
     try:
         TASKS.remove(next((item for item in TASKS if item['id'] == task_id), None))
