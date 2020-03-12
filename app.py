@@ -42,14 +42,22 @@ app.config.from_object(__name__)
 CORS(app, resources={f'/*': {'origins': '*'}})
 
 # supporting functions
-def remove_task(task_id):
-    for task in TASKS:
-        if task['id'] == task_id:
-            TASKS.remove(task)
-            return True
-    return False
+#def remove_task(task_id):
+#    for task in TASKS:
+#        if task['id'] == task_id:
+#            TASKS.remove(task)
+#            return True
+#    return False
 
-# first route
+def remove_task(task_id):
+    try:
+        TASKS.remove(next((item for item in TASKS if item['id'] == task_id), None))
+        return True
+    except ValueError:
+        return False
+
+
+# test route
 @app.route('/ping', methods=['GET'])
 def ping_pong():
     return jsonify('pong!')
@@ -70,7 +78,7 @@ def all_tasks():
         response_object['tasks'] = TASKS
     return jsonify(response_object)
 
-@app.route('/tasks/<task_id>', methods=['PUT'])
+@app.route('/tasks/<task_id>', methods=['PUT', 'DELETE'])
 def single_task(task_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
@@ -83,6 +91,9 @@ def single_task(task_id):
             'complete': post_data.get('complete')
             })
         response_object['message'] = 'Task updated!'
+    elif request.method == 'DELETE':
+        remove_task(task_id)
+        response_object['message'] = 'Task removed!'
     return jsonify(response_object)
 
 
