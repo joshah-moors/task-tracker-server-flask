@@ -5,6 +5,8 @@ Following this guide:
     https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/
 '''
 
+import os
+import pickle
 import uuid
 
 from flask import Flask, jsonify, request
@@ -13,12 +15,17 @@ from flask_cors import CORS
 # configuration
 DEBUG = True
 
+PICKLE_FILE = 'app_data.pickle'
+if os.path.exists(PICKLE_FILE):
+    print('load data')
+else:
+    print('init data')
 TASKS = [
     {
         'id': uuid.uuid4().hex,
         'title': 'Scaffold front-end',
         'owner': 'Joshah',
-        'complete': True
+        'complete': False
     },
     {
         'id': uuid.uuid4().hex,
@@ -30,7 +37,7 @@ TASKS = [
         'id': uuid.uuid4().hex,
         'title': 'Add CORS to Flask server',
         'owner': 'Joshah',
-        'complete': False
+        'complete': True
     },
 ]
 
@@ -42,6 +49,12 @@ app.config.from_object(__name__)
 CORS(app, resources={f'/*': {'origins': '*'}})
 
 # supporting functions
+def load_app_data():
+    pass
+
+def save_app_data():
+    pass
+
 def remove_task(task_id):
     try:
         TASKS.remove(next((item for item in TASKS if item['id'] == task_id), None))
