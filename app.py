@@ -26,7 +26,7 @@ CORS(app, resources={f'/*': {'origins': '*'}})
 # supporting functions
 def load_app_data():
     with open(PICKLE_FILE, 'rb') as f:
-        TASKS = pickle.load(f)
+        return pickle.load(f)
 
 def save_app_data():
     with open(PICKLE_FILE, 'wb') as f:
@@ -35,13 +35,14 @@ def save_app_data():
 def remove_task(task_id):
     try:
         TASKS.remove(next((item for item in TASKS if item['id'] == task_id), None))
+        save_app_data()
         return True
     except ValueError:
         return False
 
 # initialize the data (small pickle data for testing)
 if os.path.exists(PICKLE_FILE):
-    load_app_data()
+    TASKS = load_app_data()
 else:
     TASKS = [
         {
@@ -81,6 +82,7 @@ def all_tasks():
             'owner': post_data.get('owner'),
             'complete': post_data.get('complete')
         })
+        save_app_data()
         response_object['message'] = 'Task added!'
     else:
         response_object['tasks'] = TASKS
@@ -98,6 +100,7 @@ def single_task(task_id):
             'owner': post_data.get('owner'),
             'complete': post_data.get('complete')
             })
+        save_app_data()
         response_object['message'] = 'Task updated!'
     elif request.method == 'DELETE':
         remove_task(task_id)
