@@ -5,6 +5,8 @@ Following this guide:
     https://testdriven.io/blog/developing-a-single-page-app-with-flask-and-vuejs/
 '''
 
+import os
+import pickle
 import uuid
 
 from flask import Flask, jsonify, request
@@ -12,27 +14,7 @@ from flask_cors import CORS
 
 # configuration
 DEBUG = True
-
-TASKS = [
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Scaffold front-end',
-        'owner': 'Joshah',
-        'complete': True
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Production JS Server',
-        'owner': 'N/A',
-        'complete': False
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'Add CORS to Flask server',
-        'owner': 'Joshah',
-        'complete': False
-    },
-]
+PICKLE_FILE = 'app_data.pickle'
 
 # instantiate app
 app = Flask(__name__)
@@ -42,13 +24,47 @@ app.config.from_object(__name__)
 CORS(app, resources={f'/*': {'origins': '*'}})
 
 # supporting functions
+def load_app_data():
+    with open(PICKLE_FILE, 'rb') as f:
+        return pickle.load(f)
+
+def save_app_data():
+    with open(PICKLE_FILE, 'wb') as f:
+        pickle.dump(TASKS, f)
+
 def remove_task(task_id):
     try:
         TASKS.remove(next((item for item in TASKS if item['id'] == task_id), None))
+        save_app_data()
         return True
     except ValueError:
         return False
 
+# initialize the data (small pickle data for testing)
+if os.path.exists(PICKLE_FILE):
+    TASKS = load_app_data()
+else:
+    TASKS = [
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Scaffold front-end',
+            'owner': 'Joshah',
+            'complete': False
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Production JS Server',
+            'owner': 'N/A',
+            'complete': False
+        },
+        {
+            'id': uuid.uuid4().hex,
+            'title': 'Add CORS to Flask server',
+            'owner': 'Joshah',
+            'complete': True
+        },
+    ]
+    save_app_data()
 
 # test route
 @app.route('/ping', methods=['GET'])
@@ -66,6 +82,7 @@ def all_tasks():
             'owner': post_data.get('owner'),
             'complete': post_data.get('complete')
         })
+        save_app_data()
         response_object['message'] = 'Task added!'
     else:
         response_object['tasks'] = TASKS
@@ -83,6 +100,7 @@ def single_task(task_id):
             'owner': post_data.get('owner'),
             'complete': post_data.get('complete')
             })
+        save_app_data()
         response_object['message'] = 'Task updated!'
     elif request.method == 'DELETE':
         remove_task(task_id)
