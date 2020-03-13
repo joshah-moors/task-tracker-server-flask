@@ -25,10 +25,12 @@ CORS(app, resources={f'/*': {'origins': '*'}})
 
 # supporting functions
 def load_app_data():
-    pass
+    with open(PICKLE_FILE, 'rb') as f:
+        TASKS = pickle.load(f)
 
 def save_app_data():
-    pass
+    with open(PICKLE_FILE, 'wb') as f:
+        pickle.dump(TASKS, f)
 
 def remove_task(task_id):
     try:
@@ -39,7 +41,7 @@ def remove_task(task_id):
 
 # initialize the data (small pickle data for testing)
 if os.path.exists(PICKLE_FILE):
-    print('load data')
+    load_app_data()
 else:
     TASKS = [
         {
